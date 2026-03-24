@@ -1,4 +1,4 @@
-# Trade Opportunities API 🚀📈
+# Trade Opportunities API 
 
 A production-grade FastAPI service designed to provide real-time, AI-driven investment insights into various Indian market sectors. This project implements industry-standard security patterns, highly optimized caching, and custom rate limiting.
 
