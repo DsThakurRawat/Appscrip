@@ -25,7 +25,7 @@ async def login(request: Request):
 @router.get("/{sector}", response_model=MarketReport)
 async def analyze_sector(
     request: Request,
-    sector: str = Path(..., description="The industry sector to analyze (e.g., 'technology', 'banking', 'pharma', etc.)"),
+    sector: str = Path(..., min_length=3, regex="^[a-zA-Z ]+$", description="The industry sector to analyze (e.g., 'technology', 'banking', 'pharma', etc.)"),
     payload: dict = Depends(verify_jwt),
     _rate_limit: None = Depends(check_rate_limit)
 ):

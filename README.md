@@ -53,21 +53,26 @@ graph TD
 ### Technical Breakdown
 
 #### **Backend Framework (FastAPI)**
+
 - **How it works**: Provides the core asynchronous engine for the API. It handles routing, automatic Pydantic validation, and dependency injection for security layers.
 
 #### **Security & Authentication (JWT)**
+
 - **Library**: `PyJWT`, `passlib[bcrypt]`
 - **How it works**: We use stateless **JSON Web Tokens (JWT)**. On login, the server issues a signed token. Protected endpoints verify this signature using a secret key. Passwords are never stored in plain text.
 
 #### **Performance & Caching**
+
 - **Library**: `cachetools (TTLCache)`
 - **How it works**: To stay within Gemini's free tier quotas and ensure extreme speed, we implement an in-memory sliding cache. If the same sector is requested within 5 minutes, the result is served in **~14ms** without hitting external APIs.
 
 #### **Rate Limiting (Custom)**
+
 - **Implementation**: Sliding Window algorithm.
 - **How it works**: We track request timestamps in a per-user dictionary. If a user exceeds 5 requests per minute, the system rejects the call with a `429 Too Many Requests` status and a `Retry-After` header.
 
 #### **AI/Data Sources**
+
 - **LLM**: Google Gemini 1.5/2.x Flash.
 - **Web Search**: DuckDuckGo Search API (`ddgs`).
 - **Data Collection**: Real-time news is fetched, cleaned, and passed as context to the AI for professional synthesis.
@@ -91,24 +96,29 @@ graph TD
 ## Setup & Installation
 
 1. **Clone the repository**:
+
    ```bash
    git clone https://github.com/DsThakurRawat/Appscrip.git
    cd Appscrip
    ```
 
 2. **Create and activate a virtual environment**:
+
    ```bash
    python3 -m venv venv
    source venv/bin/activate
    ```
 
 3. **Install dependencies**:
+
    ```bash
    pip install -r requirements.txt
    ```
 
 4. **Configure Environment**:
+
    Create a `.env` file:
+
    ```env
    GEMINI_API_KEY=your_gemini_api_key_here
    SECRET_KEY=your_jwt_secret_key_here
@@ -119,19 +129,25 @@ graph TD
 ## Usage & API Flow
 
 ### 1. Get Access Token
+
 **Endpoint**: `POST /analyze/token`
+
 ```bash
 curl -X POST http://127.0.0.1:8000/analyze/token
 ```
 
 ### 2. Analyze a Market Sector
+
 **Endpoint**: `GET /analyze/{sector}`
+
 ```bash
 curl -H "Authorization: Bearer YOUR_TOKEN" http://127.0.0.1:8000/analyze/technology
 ```
 
 ### 3. Health Check
+
 **Endpoint**: `GET /analyze/health`
+
 ```bash
 curl http://127.0.0.1:8000/analyze/health
 ```
@@ -141,6 +157,7 @@ curl http://127.0.0.1:8000/analyze/health
 ## Core Logic Snippets
 
 ### Input Validation & Safety
+
 ```python
 @router.get("/{sector}", response_model=MarketReport)
 async def analyze_sector(
@@ -153,6 +170,7 @@ async def analyze_sector(
 ```
 
 ### JWT Security Model
+
 ```python
 class Token(BaseModel):
     access_token: str
