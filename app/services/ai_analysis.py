@@ -5,11 +5,15 @@ from typing import List, Dict
 import json
 import logging
 from datetime import datetime
+from cachetools import TTLCache
 
 logger = logging.getLogger(__name__)
 
 class AIAnalysisService:
     def __init__(self):
+        # 5-minute TTL cache for up to 100 sectors
+        self.cache = TTLCache(maxsize=100, ttl=300)
+        
         # Robust check for API key
         api_key = settings.GEMINI_API_KEY
         if api_key and api_key != "your_gemini_api_key_here":
@@ -27,7 +31,12 @@ class AIAnalysisService:
     async def analyze_sector(self, sector: str, raw_data: List[Dict[str, str]]) -> MarketReport:
         """
         Analyze the collected raw data and generate a structured report.
+        Uses in-memory cache to stay within AI quota limits.
         """
+        if sector in self.cache:
+            logger.info(f"Cache hit for sector: {sector}")
+            return self.cache[sector]
+
         if not self.model:
             return self._generate_fallback_report(sector)
 
@@ -59,7 +68,7 @@ class AIAnalysisService:
             json_end = text.rfind('}') + 1
             data = json.loads(text[json_start:json_end])
             
-            return MarketReport(
+            report = MarketReport(
                 sector=sector,
                 timestamp=datetime.now().isoformat(),
                 summary=data.get("summary", ""),
@@ -67,6 +76,10 @@ class AIAnalysisService:
                 news_sources=[d['link'] for d in raw_data if 'link' in d],
                 markdown_report=data.get("markdown_report", "")
             )
+            
+            # Save to cache
+            self.cache[sector] = report
+            return report
         except Exception as e:
             logger.error(f"Error in AI analysis: {e}")
             return self._generate_fallback_report(sector, error_msg=str(e))
