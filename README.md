@@ -1,8 +1,8 @@
-# 📈 Trade Opportunities API
+# Trade Opportunities API
 
 A high-performance FastAPI service designed to analyze Indian market sectors using Generative AI (Gemini) and real-time web search.
 
-## 🚀 Key Features
+## Key Features
 
 - **FastAPI**: Modern, high-performance web framework with automatic Swagger/OpenAPI documentation.
 - **AI-Driven Intelligence**: Powered by **Google Gemini 1.5/2.x Flash** for professional-grade market analysis.
@@ -12,12 +12,12 @@ A high-performance FastAPI service designed to analyze Indian market sectors usi
   - Smart rate limiting (5 requests/minute) via `Slowapi`.
   - Built-in fallback mechanisms for maximum availability.
 
-## 🛠 Prerequisites
+## Prerequisites
 
 - Python 3.8+
 - [Google Gemini API Key](https://aistudio.google.com/app/apikey)
 
-## ⚙️ Setup & Installation
+## Setup & Installation
 
 1. Clone the repository:
    ```bash
@@ -43,7 +43,7 @@ A high-performance FastAPI service designed to analyze Indian market sectors usi
    API_KEY=appscrip_dev_2026
    ```
 
-## 🏃 Running the Application
+## Running the Application
 
 Start the development server:
 ```bash
@@ -52,12 +52,12 @@ uvicorn app.main:app --reload
 
 The API will be live at `http://127.0.0.1:8000`.
 
-## 📖 API Documentation
+## API Documentation
 
 - **Interactive Documentation (Swagger)**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 - **Alternative Documentation (ReDoc)**: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
 
-## 🔍 Usage & Examples
+## Usage & Examples
 
 ### Analyze a Market Sector
 
@@ -70,7 +70,7 @@ The API will be live at `http://127.0.0.1:8000`.
 curl -H "X-API-KEY: appscrip_dev_2026" http://127.0.0.1:8000/analyze/technology
 ```
 
-## 📂 Project Structure
+## Project Structure
 
 - `app/main.py`: Application entry point and middleware configuration.
 - `app/api/`: REST API endpoints and routing logic.
