@@ -8,22 +8,22 @@ A production-grade FastAPI service designed to provide real-time, AI-driven inve
 
 - [INTRODUCTION](#introduction)
 - [Professional Implementation](#professional-implementation)
-    - [Application Flow Diagram](#application-flow-diagram)
-    - [To Run the Application Locally:](#to-run-the-application-locally)
-        - [Prerequisites](#prerequisites)
-        - [Setup Steps](#setup-steps)
-    - [Technical Deep-Dive](#technical-deep-dive)
-        - [Backend Framework (FastAPI)](#backend-framework-fastapi)
-        - [Session Management (JWT)](#session-management-jwt)
-        - [Rate Limiting (Custom)](#rate-limiting-custom)
-        - [Performance Layer (Caching)](#performance-layer-caching)
-        - [AI & Data Sources](#ai--data-sources)
-    - [API Specification & Summary Table](#api-specification--summary-table)
+  - [Application Flow Diagram](#application-flow-diagram)
+  - [To Run the Application Locally:](#to-run-the-application-locally)
+    - [Prerequisites](#prerequisites)
+    - [Setup Steps](#setup-steps)
+  - [Technical Deep-Dive](#technical-deep-dive)
+    - [Backend Framework](#backend-framework)
+    - [Session Management](#session-management)
+    - [Rate Limiting](#rate-limiting)
+    - [Security Best Practices](#security-best-practices)
+  - [API Specification](#api-specification)
+  - [Summary Table](#summary-table)
 - [Output & Implementation Screenshots](#output--implementation-screenshots)
-    - [Access Token Generation](#access-token-generation)
-    - [Authorization Flow](#authorization-flow)
-    - [Sector Analysis Endpoint](#sector-analysis-endpoint)
-    - [Health Check Monitoring](#health-check-monitoring)
+  - [Access Token Generation](#access-token-generation)
+  - [Authorization Flow](#authorization-flow)
+  - [Sector Analysis Endpoint](#sector-analysis-endpoint)
+  - [Health Check Monitoring](#health-check-monitoring)
 - [Project Structure](#project-structure)
 
 ---
@@ -67,7 +67,7 @@ graph TD
     G2 --> Q["Return 200 OK Health Status"]
 ```
 
-### To Run the Application Locally:
+### To Run the Application Locally
 
 #### Prerequisites
 - **Python 3.10+**
@@ -110,43 +110,47 @@ graph TD
 ### Technical Deep-Dive
 
 #### **Backend Framework**
+
 - **FastAPI**
-    - **Library**: `fastapi`
-    - **How it works**: Provides the main API framework, routing, dependency injection, and async support. The app is created with `FastAPI()` and endpoints are defined using decorators like `@app.get()` and `@app.post()`.
+  - **Library**: `fastapi`
+  - **How it works**: Provides the main API framework, routing, dependency injection, and async support. The app is created with `FastAPI()` and endpoints are defined using decorators like `@app.get()` and `@app.post()`.
 
 #### **Session Management**
+
 - **In-memory session tracking**
-    - **How it works**: User sessions are tracked using JWT tokens (stateless) and in-memory Python dictionaries for rate limiting and user data. No external session store is used.
+  - **How it works**: User sessions are tracked using JWT tokens (stateless) and in-memory Python dictionaries for rate limiting and user data. No external session store is used.
 
 #### **Rate Limiting**
+
 - **Custom in-memory rate limiter**
-    - **How it works**:
-        - Uses a `defaultdict(list)` to store timestamps of user requests.
-        - Checks the number of requests in a sliding window (e.g., 5 requests per 60 seconds).
-        - Raises HTTP 429 if the limit is exceeded.
-    - **Location**: `check_rate_limit()` function.
+  - **How it works**:
+    - Uses a `defaultdict(list)` to store timestamps of user requests.
+    - Checks the number of requests in a sliding window (e.g., 5 requests per 60 seconds).
+    - Raises HTTP 429 if the limit is exceeded.
+  - **Location**: `check_rate_limit()` function.
 
 #### **Security Best Practices**
+
 - **Password Hashing**:
-    - **Library**: `passlib` (with `bcrypt`)
-    - **How it works**: Passwords are hashed and verified securely using industry-standard algorithms.
+  - **Library**: `passlib` (with `bcrypt`)
+  - **How it works**: Passwords are hashed and verified securely using industry-standard algorithms.
 - **JWT Authentication**:
-    - **Libraries**: `PyJWT`
-    - **How it works**: JWT tokens are issued on login and required for protected endpoints.
+  - **Libraries**: `PyJWT`
+  - **How it works**: JWT tokens are issued on login and required for protected endpoints.
 - **Error Handling**:
-    - **How it works**: Uses FastAPI's `HTTPException` for clear, descriptive error responses.
+  - **How it works**: Uses FastAPI's `HTTPException` for clear, descriptive error responses.
 
 ---
 
 ### API Specification
 
 - **Single Endpoint**:
-    - **GET /analyze/{sector}**
-    - **How it works**:
-        - Accepts a sector name, collects data, analyzes it with Gemini, and returns a markdown report.
-        - Requires authentication and is rate-limited.
+  - **GET /analyze/{sector}**
+  - **How it works**:
+    - Accepts a sector name, collects data, analyzes it with Gemini, and returns a markdown report.
+    - Requires authentication and is rate-limited.
 
-#### **Summary Table:**
+#### **Summary Table**
 
 | Feature | Library / Model | How it Works (Short) |
 | :--- | :--- | :--- |
