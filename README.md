@@ -169,12 +169,13 @@ graph TD
 ### Input/output Validation or type checking
 
 ```python
-@app.get("/analyze/{sector}", response_class=PlainTextResponse)
+@app.get("/analyze/{sector}", response_model=MarketReport)
 async def analyze_sector(
     sector: str = Path(..., min_length=3, regex="^[a-zA-Z ]+$"),
-    user: User = Depends(get_current_user)
+    payload: dict = Depends(verify_jwt),
+    _rate_limit: None = Depends(check_rate_limit)
 ):
-    # 1. Validation Logic
+    # 1. Validation Logic (performed by FastAPI/Pydantic)
     # 2. Data Collection
     # 3. AI Analysis
     ...
