@@ -6,19 +6,29 @@ A production-grade FastAPI service designed to provide real-time, AI-driven inve
 
 ## 📋 Table of Contents
 
-- [1. INTRODUCTION](#1-introduction)
-- [2. Detailed Implementation](#2-detailed-implementation)
+- [INTRODUCTION](#introduction)
+- [Professional Implementation](#professional-implementation)
     - [Application Flow Diagram](#application-flow-diagram)
-    - [Technical Breakdown](#technical-breakdown)
-    - [Security Summary Table](#security-summary-table)
-- [3. Setup & Installation](#3-setup--installation)
-- [4. API Specification & Usage](#4-api-specification--usage)
-- [5. Output & Implementation Screenshots](#5-output--implementation-screenshots)
-- [6. Project Structure](#6-project-structure)
+    - [To Run the Application Locally:](#to-run-the-application-locally)
+        - [Prerequisites](#prerequisites)
+        - [Setup Steps](#setup-steps)
+    - [Technical Deep-Dive](#technical-deep-dive)
+        - [Backend Framework (FastAPI)](#backend-framework-fastapi)
+        - [Session Management (JWT)](#session-management-jwt)
+        - [Rate Limiting (Custom)](#rate-limiting-custom)
+        - [Performance Layer (Caching)](#performance-layer-caching)
+        - [AI & Data Sources](#ai--data-sources)
+    - [API Specification & Summary Table](#api-specification--summary-table)
+- [Output & Implementation Screenshots](#output--implementation-screenshots)
+    - [Access Token Generation](#access-token-generation)
+    - [Authorization Flow](#authorization-flow)
+    - [Sector Analysis Endpoint](#sector-analysis-endpoint)
+    - [Health Check Monitoring](#health-check-monitoring)
+- [Project Structure](#project-structure)
 
 ---
 
-## 1. INTRODUCTION
+## INTRODUCTION
 
 Hi Team, I have implemented a professional, high-performance FastAPI application for market analysis reports as per the specified requirements. This service combines real-time data scraping with Generative AI to provide actionable investment reports.
 
@@ -26,7 +36,7 @@ This version moves beyond a simple script, implementing **JWT-based authenticati
 
 ---
 
-## 2. Detailed Implementation
+## Professional Implementation
 
 ### Application Flow Diagram
 
@@ -57,46 +67,22 @@ graph TD
     G2 --> Q["Return 200 OK Health Status"]
 ```
 
-### Technical Breakdown
+### To Run the Application Locally:
 
-#### **Backend Framework (FastAPI)**
-- **How it works**: Provides the core asynchronous engine. It handles routing, automatic Pydantic validation, and dependency injection for security layers.
+#### Prerequisites
+- **Python 3.10+**
+- **Git**
+- **Google Gemini API Key**
 
-#### **Security & Authentication (JWT)**
-- **Library**: `PyJWT`, `passlib[bcrypt]`
-- **How it works**: Uses stateless **JSON Web Tokens (JWT)**. On login, the server issues a signed token. Protected endpoints verify this signature using a secret key. Passwords are never stored in plain text.
+#### Setup Steps
 
-#### **Performance & Caching**
-- **Library**: `cachetools (TTLCache)`
-- **How it works**: To ensure extreme speed and protect Gemini's API quota, we implement an in-memory sliding cache. Repeated requests for the same sector return in **~14ms**.
-
-#### **Rate Limiting (Custom)**
-- **Implementation**: Sliding Window algorithm.
-- **How it works**: Tracks request timestamps per user. Exceeding 5 requests/min triggers a `429` status with `Retry-After` headers.
-
----
-
-### Security Summary Table
-
-| Feature | Library / Model | How it Works (Short) |
-| :--- | :--- | :--- |
-| **Authentication** | `PyJWT`, `passlib` | Stateless JWT tokens + password hashing |
-| **Rate Limiting** | Custom Logic | Sliding window, per-IP, in-memory |
-| **LLM (AI)** | `google-generativeai` | Gemini AI for report generation |
-| **Web Search** | `duckduckgo-search` | Scrape real-time market trends |
-| **Caching** | `cachetools` | 5-min TTL cache for instant responses |
-
----
-
-## 3. Setup & Installation
-
-1. **Clone the repository**:
+1. **Clone and Navigate**:
    ```bash
    git clone https://github.com/DsThakurRawat/Appscrip.git
    cd Appscrip
    ```
 
-2. **Create and activate a virtual environment**:
+2. **Virtual Environment**:
    ```bash
    python3 -m venv venv
    source venv/bin/activate
@@ -107,77 +93,76 @@ graph TD
    pip install -r requirements.txt
    ```
 
-4. **Configure Environment**:
-   Create a `.env` file:
+4. **Environment Variables**:
+   Create a `.env` file in the root:
    ```env
    GEMINI_API_KEY=your_gemini_api_key_here
    SECRET_KEY=your_jwt_secret_key_here
    ```
 
----
-
-## 4. API Specification & Usage
-
-### **1. Access Token Generation**
-- **Endpoint**: `POST /analyze/token`
-- **Description**: Authenticate and receive a Bearer token.
-- **Request Body**: (Form Data)
-  - `username`: guest_user
-  - `password`: password123
-- **Example Response**:
-```json
-{
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "token_type": "bearer"
-}
-```
-
-### **2. Sector Analysis Endpoint**
-- **Endpoint**: `GET /analyze/{sector}`
-- **Description**: Main endpoint to analyze a sector. Requires Authentication.
-- **Rate Limit**: 5 requests per minute.
-- **Parameters**: 
-  - `sector` (path): Industry sector name (e.g., `technology`, `healthcare`)
-- **Example Response**:
-```json
-{
-  "sector": "technology",
-  "summary": "The Indian tech sector is seeing strong growth...",
-  "opportunities": [
-    {
-      "title": "Digital Transformation",
-      "potential": "High"
-    }
-  ]
-}
-```
-
-### **3. Health Check**
-- **Endpoint**: `GET /analyze/health`
-- **Description**: Verify service availability.
-- **Example Response**:
-```json
-{
-  "status": "healthy",
-  "version": "1.0.0"
-}
-```
+5. **Start the server**:
+   ```bash
+   uvicorn app.main:app --reload
+   ```
 
 ---
 
-## 5. Output & Implementation Screenshots
+### Technical Deep-Dive
 
-### **Swagger API Documentation**
-The API includes interactive documentation where you can test the JWT flow directly.
-![Swagger Overview](docs/screenshots/swagger_overview.png)
+#### **Backend Framework (FastAPI)**
+- **How it works**: Uses the core asynchronous engine for non-blocking I/O. It handles routing, automatic Pydantic validation, and dependency injection for security layers.
 
-### **Sector Analysis Report**
-Example of a professional, AI-generated Indian market report for the 'Technology' sector.
+#### **Session Management (JWT)**
+- **Library**: `PyJWT`, `passlib[bcrypt]`
+- **How it works**: We use stateless **JSON Web Tokens (JWT)**. On login, the server issues a signed token. Protected endpoints verify this signature using a secret key. Passwords are never stored in plain text.
+
+#### **Rate Limiting (Custom)**
+- **Implementation**: Sliding Window algorithm.
+- **How it works**: Tracks request timestamps in a per-user dictionary. If a user exceeds 5 requests per minute, the system rejects the call with a `429 Too Many Requests` status and a `Retry-After` header.
+
+#### **Performance Layer (Caching)**
+- **Library**: `cachetools (TTLCache)`
+- **How it works**: Repeated requests for the same sector are served from an in-memory TTL cache in **~14ms**, saving both AI quota and latency.
+
+#### **AI & Data Sources**
+- **LLM**: Google Gemini 1.5/2.x Flash.
+- **Search**: DuckDuckGo API integration for real-time market context.
+
+---
+
+### API Specification & Summary Table
+
+| Feature | Library / Model | How it Works (Short) |
+| :--- | :--- | :--- |
+| **Authentication** | `PyJWT`, `passlib` | Stateless JWT tokens + password hashing |
+| **Rate Limiting** | Custom Logic | Sliding window, per-IP, in-memory |
+| **LLM (AI)** | `google-generativeai` | Gemini AI for report generation |
+| **Caching** | `cachetools` | 5-min TTL cache for instant responses |
+| **Storage** | Python Dicts | In-memory stateless architecture |
+
+---
+
+## Output & Implementation Screenshots
+
+### Access Token Generation
+The login endpoint handles credential verification and issues the bearer token.
+![Token Generation](docs/screenshots/swagger_overview.png)
+
+### Authorization Flow
+Securely authorized requests using the `Authorization: Bearer <token>` header pattern.
+![Auth Flow](docs/screenshots/swagger_overview.png)
+
+### Sector Analysis Endpoint
+Real-world output of the AI-generated sector analysis report.
 ![Analysis Report](docs/screenshots/analysis_report.png)
 
+### Health Check Monitoring
+Dedicated endpoint for infrastructure monitoring and deployment readiness.
+![Health Check](docs/screenshots/swagger_overview.png)
+
 ---
 
-## 6. Project Structure
+## Project Structure
 
 - `app/main.py`: Entry point with CORS and Router initialization.
 - `app/api/`: Endpoint definitions and request/response handling.
