@@ -49,6 +49,11 @@ Start the development server:
 uvicorn app.main:app --reload
 ```
 
+## API Documentation
+
+- **Interactive Documentation (Swagger)**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- **Alternative Documentation (ReDoc)**: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
+
 ## Usage & API Flow
 
 ### 1. Get Access Token
