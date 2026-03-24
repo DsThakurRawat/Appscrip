@@ -1,0 +1,20 @@
+# Virtual Environment
+venv/
+.env
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Private Docs (Requested by User)
+.gemini/antigravity/brain/bdc3850f-26d4-4e01-b58a-9858da8705ad/implementation_plan.md
+.gemini/antigravity/brain/bdc3850f-26d4-4e01-b58a-9858da8705ad/learning_requirements.md
+Assignment_Python.pdf
+
+# Logs
+*.log
