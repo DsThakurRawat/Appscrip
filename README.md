@@ -1,71 +1,79 @@
-# Trade Opportunities API
+# 📈 Trade Opportunities API
 
-A professional FastAPI service that provides market analysis and trade opportunity insights for specific sectors in India using Google Gemini AI.
+A high-performance FastAPI service designed to analyze Indian market sectors using Generative AI (Gemini) and real-time web search.
 
-## Features
-- **FastAPI**: Modern, fast (high-performance) web framework.
-- **AI Analysis**: Powered by Google Gemini 1.5-flash for professional market reports.
-- **Web Search**: Real-time data collection using DuckDuckGo Search.
-- **Security**: Simple API Key authentication and Rate Limiting.
-- **Documentation**: Auto-generated Swagger UI and Redoc.
+## 🚀 Key Features
 
-## Prerequisites
+- **FastAPI**: Modern, high-performance web framework with automatic Swagger/OpenAPI documentation.
+- **AI-Driven Intelligence**: Powered by **Google Gemini 1.5/2.x Flash** for professional-grade market analysis.
+- **Real-time Insights**: Integrates DuckDuckGo Search to fetch the latest market trends and news from the Indian economy.
+- **Secure & Robust**:
+  - API Key authentication (`X-API-KEY` header).
+  - Smart rate limiting (5 requests/minute) via `Slowapi`.
+  - Built-in fallback mechanisms for maximum availability.
+
+## 🛠 Prerequisites
+
 - Python 3.8+
 - [Google Gemini API Key](https://aistudio.google.com/app/apikey)
 
-## Setup
+## ⚙️ Setup & Installation
 
-1. **Clone the repository**:
+1. Clone the repository:
    ```bash
    git clone <repo-url>
    cd Appscrip
    ```
 
-2. **Create a virtual environment**:
+2. Create a virtual environment:
    ```bash
    python3 -m venv venv
    source venv/bin/activate
    ```
 
-3. **Install dependencies**:
+3. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Configure environment variables**:
+4. Configure Environment:
    Create a `.env` file in the root directory:
    ```env
    GEMINI_API_KEY=your_gemini_api_key_here
-   API_KEY=appscrip_dev_2024
+   API_KEY=appscrip_dev_2026
    ```
 
-## Running the Application
+## 🏃 Running the Application
 
-Start the server using Uvicorn:
+Start the development server:
 ```bash
 uvicorn app.main:app --reload
 ```
-The API will be available at `http://127.0.0.1:8000`.
 
-## API Documentation
-- **Swagger UI**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-- **ReDoc**: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
+The API will be live at `http://127.0.0.1:8000`.
 
-## Usage Example
+## 📖 API Documentation
 
-### Analyze a Sector
+- **Interactive Documentation (Swagger)**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- **Alternative Documentation (ReDoc)**: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
+
+## 🔍 Usage & Examples
+
+### Analyze a Market Sector
+
 **Endpoint**: `GET /analyze/{sector}`
-**Header**: `X-API-KEY: appscrip_dev_2024`
 
-Example with `curl`:
+**Supported Sectors**: `pharmaceuticals`, `technology`, `banking`, `automotive`, `telecommunications`, `energy`, `healthcare`, `consumer goods`, `retail`, `real estate`, `media`, `agriculture`, `mining`, `textiles`, `chemicals`, `education`, `tourism`, `sports`, etc.
+
+**Example Request (`curl`)**:
 ```bash
-curl -H "X-API-KEY: appscrip_dev_2024" http://127.0.0.1:8000/analyze/pharmaceuticals
+curl -H "X-API-KEY: appscrip_dev_2026" http://127.0.0.1:8000/analyze/technology
 ```
 
-## Project Structure
-- `app/main.py`: Entry point.
-- `app/api/`: API routes.
-- `app/services/`: Business logic (Scraping, AI Analysis).
-- `app/core/`: Configuration and Security.
-- `app/models/`: Pydantic schemas.
-# Appscrip
+## 📂 Project Structure
+
+- `app/main.py`: Application entry point and middleware configuration.
+- `app/api/`: REST API endpoints and routing logic.
+- `app/services/`: Core logic for Data Scraping and AI Analysis.
+- `app/core/`: Security protocols, rate limiting, and config management.
+- `app/models/`: Pydantic data schemas for validation.
