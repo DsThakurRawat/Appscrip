@@ -34,27 +34,27 @@ The following diagram illustrates the lifecycle of a request, from authenticatio
 
 ```mermaid
 graph TD
-    A[Client Request] --> B[POST /analyze/token - Login]
+    A[Client Request] --> B["POST /analyze/token - Login"]
     B --> C{Correct Credentials?}
-    C -- Yes --> D[JWT Token Issued]
-    C -- No --> E[401 Unauthorized]
-    D --> F[Client stores token]
+    C -- Yes --> D["JWT Token Issued"]
+    C -- No --> E["401 Unauthorized"]
+    D --> F["Client stores token"]
     
-    F --> G1[GET /analyze/{sector}]
-    F --> G2[GET /analyze/health]
+    F --> G1["GET /analyze/{sector}"]
+    F --> G2["GET /analyze/health"]
     
-    G1 --> H[Auth: Verify JWT Signature]
-    H -- Invalid --> I[401 Not Authenticated]
-    H -- Valid --> J[Check Rate Limiter]
-    J -- Limit Exceeded --> K[429 Too Many Requests]
+    G1 --> H["Auth: Verify JWT Signature"]
+    H -- Invalid --> I["401 Not Authenticated"]
+    H -- Valid --> J["Check Rate Limiter"]
+    J -- Limit Exceeded --> K["429 Too Many Requests"]
     J -- Allowed --> L{In-memory Cache Hit?}
     
-    L -- Yes --> M[Return Cached Report (14ms)]
-    L -- No --> N[search_market_data - DuckDuckGo]
-    N --> O[analyze_with_gemini - Gemini API]
-    O --> P[Store in Cache & Return Markdown Report]
+    L -- Yes --> M["Return Cached Report (14ms)"]
+    L -- No --> N["search_market_data - DuckDuckGo"]
+    N --> O["analyze_with_gemini - Gemini API"]
+    O --> P["Store in Cache & Return Markdown Report"]
     
-    G2 --> Q[Return 200 OK Health Status]
+    G2 --> Q["Return 200 OK Health Status"]
 ```
 
 ### Technical Breakdown
@@ -118,28 +118,50 @@ graph TD
 
 ## 4. API Specification & Usage
 
-### **Endpoint A: Token Generation**
-- **Method**: `POST`
-- **Path**: `/analyze/token`
-- **Auth**: Basic Auth (Demonstration uses pre-set guest credentials)
-- **Response**: `{"access_token": "...", "token_type": "bearer"}`
-
-### **Endpoint B: Sector Analysis**
-- **Method**: `GET`
-- **Path**: `/analyze/{sector}`
-- **Auth**: JWT (Bearer Token)
-- **Rate Limit**: 5 calls per minute.
-- **Parameters**: `sector` (string, min_length 3, regex `^[a-zA-Z ]+$`)
-
-**Example Request**:
-```bash
-curl -H "Authorization: Bearer YOUR_TOKEN" http://127.0.0.1:8000/analyze/technology
+### **1. Access Token Generation**
+- **Endpoint**: `POST /analyze/token`
+- **Description**: Authenticate and receive a Bearer token.
+- **Request Body**: (Form Data)
+  - `username`: guest_user
+  - `password`: password123
+- **Example Response**:
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "bearer"
+}
 ```
 
-### **Endpoint C: Health Check**
-- **Method**: `GET`
-- **Path**: `/analyze/health`
-- **Response**: `{"status": "healthy", ...}`
+### **2. Sector Analysis Endpoint**
+- **Endpoint**: `GET /analyze/{sector}`
+- **Description**: Main endpoint to analyze a sector. Requires Authentication.
+- **Rate Limit**: 5 requests per minute.
+- **Parameters**: 
+  - `sector` (path): Industry sector name (e.g., `technology`, `healthcare`)
+- **Example Response**:
+```json
+{
+  "sector": "technology",
+  "summary": "The Indian tech sector is seeing strong growth...",
+  "opportunities": [
+    {
+      "title": "Digital Transformation",
+      "potential": "High"
+    }
+  ]
+}
+```
+
+### **3. Health Check**
+- **Endpoint**: `GET /analyze/health`
+- **Description**: Verify service availability.
+- **Example Response**:
+```json
+{
+  "status": "healthy",
+  "version": "1.0.0"
+}
+```
 
 ---
 
