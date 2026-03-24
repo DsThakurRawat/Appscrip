@@ -109,36 +109,79 @@ graph TD
 
 ### Technical Deep-Dive
 
-#### **Backend Framework (FastAPI)**
-- **How it works**: Uses the core asynchronous engine for non-blocking I/O. It handles routing, automatic Pydantic validation, and dependency injection for security layers.
+#### **Backend Framework**
+- **FastAPI**
+    - **Library**: `fastapi`
+    - **How it works**: Provides the main API framework, routing, dependency injection, and async support. The app is created with `FastAPI()` and endpoints are defined using decorators like `@app.get()` and `@app.post()`.
 
-#### **Session Management (JWT)**
-- **Library**: `PyJWT`, `passlib[bcrypt]`
-- **How it works**: We use stateless **JSON Web Tokens (JWT)**. On login, the server issues a signed token. Protected endpoints verify this signature using a secret key. Passwords are never stored in plain text.
+#### **Session Management**
+- **In-memory session tracking**
+    - **How it works**: User sessions are tracked using JWT tokens (stateless) and in-memory Python dictionaries for rate limiting and user data. No external session store is used.
 
-#### **Rate Limiting (Custom)**
-- **Implementation**: Sliding Window algorithm.
-- **How it works**: Tracks request timestamps in a per-user dictionary. If a user exceeds 5 requests per minute, the system rejects the call with a `429 Too Many Requests` status and a `Retry-After` header.
+#### **Rate Limiting**
+- **Custom in-memory rate limiter**
+    - **How it works**:
+        - Uses a `defaultdict(list)` to store timestamps of user requests.
+        - Checks the number of requests in a sliding window (e.g., 5 requests per 60 seconds).
+        - Raises HTTP 429 if the limit is exceeded.
+    - **Location**: `check_rate_limit()` function.
 
-#### **Performance Layer (Caching)**
-- **Library**: `cachetools (TTLCache)`
-- **How it works**: Repeated requests for the same sector are served from an in-memory TTL cache in **~14ms**, saving both AI quota and latency.
-
-#### **AI & Data Sources**
-- **LLM**: Google Gemini 1.5/2.x Flash.
-- **Search**: DuckDuckGo API integration for real-time market context.
+#### **Security Best Practices**
+- **Password Hashing**:
+    - **Library**: `passlib` (with `bcrypt`)
+    - **How it works**: Passwords are hashed and verified securely using industry-standard algorithms.
+- **JWT Authentication**:
+    - **Libraries**: `PyJWT`
+    - **How it works**: JWT tokens are issued on login and required for protected endpoints.
+- **Error Handling**:
+    - **How it works**: Uses FastAPI's `HTTPException` for clear, descriptive error responses.
 
 ---
 
-### API Specification & Summary Table
+### API Specification
+
+- **Single Endpoint**:
+    - **GET /analyze/{sector}**
+    - **How it works**:
+        - Accepts a sector name, collects data, analyzes it with Gemini, and returns a markdown report.
+        - Requires authentication and is rate-limited.
+
+#### **Summary Table:**
 
 | Feature | Library / Model | How it Works (Short) |
 | :--- | :--- | :--- |
-| **Authentication** | `PyJWT`, `passlib` | Stateless JWT tokens + password hashing |
-| **Rate Limiting** | Custom Logic | Sliding window, per-IP, in-memory |
-| **LLM (AI)** | `google-generativeai` | Gemini AI for report generation |
-| **Caching** | `cachetools` | 5-min TTL cache for instant responses |
-| **Storage** | Python Dicts | In-memory stateless architecture |
+| **FastAPI** | `fastapi` | Main API framework |
+| **Session Management** | `JWT, in-memory dict` | JWT tokens + in-memory tracking |
+| **Rate Limiting** | `Python dict, FastAPI` | Sliding window, per-user, in-memory |
+| **Security Best Practices** | `passlib, PyJWT` | Hashed passwords, JWT, error handling |
+| **Input Validation** | `pydantic, FastAPI` | Typed models, parameter checks |
+| **LLM (AI)** | `google-generativeai` | Market analysis via prompt to Gemini |
+| **Web Search** | `duckduckgo-search` | Fetches sector news/data |
+| **Storage** | `In-memory dicts` | No database, all in RAM |
+| **Authentication** | `fastapi.security, passlib` | JWT, hashed passwords |
+
+---
+
+### Input/output Validation or type checking
+
+```python
+@app.get("/analyze/{sector}", response_class=PlainTextResponse)
+async def analyze_sector(
+    sector: str = Path(..., min_length=3, regex="^[a-zA-Z ]+$"),
+    user: User = Depends(get_current_user)
+):
+    # 1. Validation Logic
+    # 2. Data Collection
+    # 3. AI Analysis
+    ...
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class User(BaseModel):
+    username: str
+```
 
 ---
 
