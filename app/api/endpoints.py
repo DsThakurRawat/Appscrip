@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, Request, Path, Query
 from fastapi.responses import PlainTextResponse
-from app.models.schemas import MarketReport
 from app.services.market_data import market_data_service
 from app.services.ai_analysis import ai_analysis_service
 from app.core.security import verify_jwt, create_access_token
@@ -26,8 +25,8 @@ async def login(request: Request):
 @router.get("/{sector}")
 async def analyze_sector(
     request: Request,
-    sector: str = Path(..., min_length=3, regex="^[a-zA-Z ]+$", description="The industry sector to analyze (e.g., 'technology', 'banking', 'pharma', etc.)"),
-    format: str = Query("json", regex="^(json|markdown)$", description="The output format (json or markdown)"),
+    sector: str = Path(..., min_length=3, pattern="^[a-zA-Z ]+$", description="The industry sector to analyze (e.g., 'technology', 'banking', 'pharma', etc.)"),
+    format: str = Query("json", pattern="^(json|markdown)$", description="The output format (json or markdown)"),
     payload: dict = Depends(verify_jwt),
     _rate_limit: None = Depends(check_rate_limit)
 ):
