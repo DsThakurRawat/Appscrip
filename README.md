@@ -1,10 +1,10 @@
-# Trade Opportunities API 
+# Trade Opportunities API
 
 A production-grade FastAPI service designed to provide real-time, AI-driven investment insights into various Indian market sectors. This project implements industry-standard security patterns, highly optimized caching, and custom rate limiting.
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [INTRODUCTION](#introduction)
 - [Professional Implementation](#professional-implementation)
@@ -70,6 +70,7 @@ graph TD
 ### To Run the Application Locally
 
 #### Prerequisites
+
 - **Python 3.10+**
 - **Git**
 - **Google Gemini API Key**
@@ -77,30 +78,35 @@ graph TD
 #### Setup Steps
 
 1. **Clone and Navigate**:
+
    ```bash
    git clone https://github.com/DsThakurRawat/Appscrip.git
    cd Appscrip
    ```
 
 2. **Virtual Environment**:
+
    ```bash
    python3 -m venv venv
    source venv/bin/activate
    ```
 
 3. **Install dependencies**:
+
    ```bash
    pip install -r requirements.txt
    ```
 
 4. **Environment Variables**:
    Create a `.env` file in the root:
+
    ```env
    GEMINI_API_KEY=your_gemini_api_key_here
    SECRET_KEY=your_jwt_secret_key_here
    ```
 
 5. **Start the server**:
+
    ```bash
    uvicorn app.main:app --reload
    ```
@@ -193,18 +199,22 @@ class User(BaseModel):
 ## Output & Implementation Screenshots
 
 ### Access Token Generation
+
 The login endpoint handles credential verification and issues the bearer token.
 ![Token Generation](docs/screenshots/swagger_overview.png)
 
 ### Authorization Flow
+
 Securely authorized requests using the `Authorization: Bearer <token>` header pattern.
 ![Auth Flow](docs/screenshots/swagger_overview.png)
 
 ### Sector Analysis Endpoint
+
 Real-world output of the AI-generated sector analysis report.
 ![Analysis Report](docs/screenshots/analysis_report.png)
 
 ### Health Check Monitoring
+
 Dedicated endpoint for infrastructure monitoring and deployment readiness.
 ![Health Check](docs/screenshots/swagger_overview.png)
 
