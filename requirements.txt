@@ -6,9 +6,11 @@ google-generativeai
 httpx
 beautifulsoup4
 duckduckgo-search
-slowapi
 python-dotenv
 python-multipart
 pyjwt
+passlib[bcrypt]
+bcrypt
+cachetools
 pytest
 pytest-asyncio
