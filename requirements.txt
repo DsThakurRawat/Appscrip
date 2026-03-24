@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+pydantic
+pydantic-settings
+google-generativeai
+httpx
+beautifulsoup4
+duckduckgo-search
+slowapi
+python-dotenv
+python-multipart
+pyjwt
+pytest
+pytest-asyncio
