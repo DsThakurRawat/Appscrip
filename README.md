@@ -4,18 +4,11 @@ A high-performance FastAPI service designed to analyze Indian market sectors usi
 
 ## Key Features
 
-- **FastAPI**: Modern, high-performance web framework with automatic Swagger/OpenAPI documentation.
-- **AI-Driven Intelligence**: Powered by **Google Gemini 1.5/2.x Flash** for professional-grade market analysis.
-- **Real-time Insights**: Integrates DuckDuckGo Search to fetch the latest market trends and news from the Indian economy.
-- **Secure & Robust**:
-  - API Key authentication (`X-API-KEY` header).
-  - Smart rate limiting (5 requests/minute) via `Slowapi`.
-  - Built-in fallback mechanisms for maximum availability.
-
-## Prerequisites
-
-- Python 3.8+
-- [Google Gemini API Key](https://aistudio.google.com/app/apikey)
+- **FastAPI**: Modern, high-performance web framework.
+- **JWT Authentication**: Secure, token-based access via `/token` endpoint.
+- **Professional Caching**: 5-minute in-memory TTL cache for near-instant repeated requests (~14ms).
+- **Custom Rate Limiting**: Built-in sliding-window protection (5 req/min) with `Retry-After` support.
+- **AI-Driven Intelligence**: Powered by **Google Gemini 1.5/2.x Flash**.
 
 ## Setup & Installation
 
@@ -45,7 +38,7 @@ A high-performance FastAPI service designed to analyze Indian market sectors usi
 
    ```env
    GEMINI_API_KEY=your_gemini_api_key_here
-   API_KEY=appscrip_dev_2026
+   SECRET_KEY=your_jwt_secret_key
    ```
 
 ## Running the Application
@@ -56,24 +49,25 @@ Start the development server:
 uvicorn app.main:app --reload
 ```
 
-The API will be live at `http://127.0.0.1:8000`.
+## Usage & API Flow
 
-## API Documentation
-
-- **Interactive Documentation (Swagger)**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-- **Alternative Documentation (ReDoc)**: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
-
-## Usage & Examples
-
-### Analyze a Market Sector
-
-**Endpoint**: `GET /analyze/{sector}`
-
-**Supported Sectors**: `pharmaceuticals`, `technology`, `banking`, `automotive`, `telecommunications`, `energy`, `healthcare`, `consumer goods`, `retail`, `real estate`, `media`, `agriculture`, `mining`, `textiles`, `chemicals`, `education`, `tourism`, `sports`, etc.
-
-**Example Request (`curl`)**:
+### 1. Get Access Token
+**Endpoint**: `POST /analyze/token`
 ```bash
-curl -H "X-API-KEY: appscrip_dev_2026" http://127.0.0.1:8000/analyze/technology
+curl -X POST http://127.0.0.1:8000/analyze/token
+```
+*Response*: `{"access_token": "...", "token_type": "bearer"}`
+
+### 2. Analyze a Market Sector
+**Endpoint**: `GET /analyze/{sector}`
+```bash
+curl -H "Authorization: Bearer YOUR_TOKEN" http://127.0.0.1:8000/analyze/technology
+```
+
+### 3. Health Check
+**Endpoint**: `GET /analyze/health`
+```bash
+curl http://127.0.0.1:8000/analyze/health
 ```
 
 ## Project Structure
