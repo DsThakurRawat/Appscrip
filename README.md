@@ -52,20 +52,27 @@ uvicorn app.main:app --reload
 ## Usage & API Flow
 
 ### 1. Get Access Token
+
 **Endpoint**: `POST /analyze/token`
+
 ```bash
 curl -X POST http://127.0.0.1:8000/analyze/token
 ```
+
 *Response*: `{"access_token": "...", "token_type": "bearer"}`
 
 ### 2. Analyze a Market Sector
+
 **Endpoint**: `GET /analyze/{sector}`
+
 ```bash
 curl -H "Authorization: Bearer YOUR_TOKEN" http://127.0.0.1:8000/analyze/technology
 ```
 
 ### 3. Health Check
+
 **Endpoint**: `GET /analyze/health`
+
 ```bash
 curl http://127.0.0.1:8000/analyze/health
 ```
