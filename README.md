@@ -1,4 +1,4 @@
-# Trade Opportunities API
+# Trade Opportunities API 🚀📈
 
 A production-grade FastAPI service designed to provide real-time, AI-driven investment insights into various Indian market sectors. This project implements industry-standard security patterns, highly optimized caching, and custom rate limiting.
 
@@ -6,119 +6,109 @@ A production-grade FastAPI service designed to provide real-time, AI-driven inve
 
 ## 📋 Table of Contents
 
-- [INTRODUCTION](#introduction)
-- [Detailed Implementation](#detailed-implementation)
+- [1. INTRODUCTION](#1-introduction)
+- [2. Detailed Implementation](#2-detailed-implementation)
     - [Application Flow Diagram](#application-flow-diagram)
     - [Technical Breakdown](#technical-breakdown)
-    - [Summary Table](#summary-table)
-- [Setup & Installation](#setup--installation)
-- [Usage & API Flow](#usage--api-flow)
-- [Core Logic Snippets](#core-logic-snippets)
-- [Project Structure](#project-structure)
+    - [Security Summary Table](#security-summary-table)
+- [3. Setup & Installation](#3-setup--installation)
+- [4. API Specification & Usage](#4-api-specification--usage)
+- [5. Output & Implementation Screenshots](#5-output--implementation-screenshots)
+- [6. Project Structure](#6-project-structure)
 
 ---
 
-## INTRODUCTION
+## 1. INTRODUCTION
 
-Hi Team, I have implemented a professional FastAPI application for market analysis reports as per the specified requirements. This service combines real-time data scraping with Generative AI to provide actionable investment reports.
+Hi Team, I have implemented a professional, high-performance FastAPI application for market analysis reports as per the specified requirements. This service combines real-time data scraping with Generative AI to provide actionable investment reports.
 
-I have focused on **Resilience** (handling AI quota limits via caching), **Security** (JWT tokens with hashed passwords), and **Performance** (sub-20ms response times for cached data).
+This version moves beyond a simple script, implementing **JWT-based authentication**, **sliding-window rate limiting**, and **in-memory TTL caching** to ensure the service is production-ready and protects against AI quota exhaustion.
 
 ---
 
-## Detailed Implementation
+## 2. Detailed Implementation
 
 ### Application Flow Diagram
 
+The following diagram illustrates the lifecycle of a request, from authentication to the final AI-generated report:
+
 ```mermaid
 graph TD
-    A[Client Request] --> B[POST /token - Login]
-    B --> C{JWT Token issued}
-    C --> D[Client stores token]
+    A[Client Request] --> B[POST /analyze/token - Login]
+    B --> C{Correct Credentials?}
+    C -- Yes --> D[JWT Token Issued]
+    C -- No --> E[401 Unauthorized]
+    D --> F[Client stores token]
     
-    D --> E1[GET /analyze/{sector}]
-    D --> E2[GET /health]
+    F --> G1[GET /analyze/{sector}]
+    F --> G2[GET /analyze/health]
     
-    E1 --> F[Auth: Validate JWT Signature]
-    F --> G[Custom Rate Limiter Check]
-    G --> H{In-memory Cache Hit?}
-    H -- Yes --> I[Return Cached Report]
-    H -- No --> J[search_market_data - DuckDuckGo]
-    J --> K[analyze_with_gemini - Gemini API]
-    K --> L[Store in Cache & Return Markdown Report]
+    G1 --> H[Auth: Verify JWT Signature]
+    H -- Invalid --> I[401 Not Authenticated]
+    H -- Valid --> J[Check Rate Limiter]
+    J -- Limit Exceeded --> K[429 Too Many Requests]
+    J -- Allowed --> L{In-memory Cache Hit?}
     
-    E2 --> M[Return Health Status]
+    L -- Yes --> M[Return Cached Report (14ms)]
+    L -- No --> N[search_market_data - DuckDuckGo]
+    N --> O[analyze_with_gemini - Gemini API]
+    O --> P[Store in Cache & Return Markdown Report]
+    
+    G2 --> Q[Return 200 OK Health Status]
 ```
 
 ### Technical Breakdown
 
 #### **Backend Framework (FastAPI)**
-
-- **How it works**: Provides the core asynchronous engine for the API. It handles routing, automatic Pydantic validation, and dependency injection for security layers.
+- **How it works**: Provides the core asynchronous engine. It handles routing, automatic Pydantic validation, and dependency injection for security layers.
 
 #### **Security & Authentication (JWT)**
-
 - **Library**: `PyJWT`, `passlib[bcrypt]`
-- **How it works**: We use stateless **JSON Web Tokens (JWT)**. On login, the server issues a signed token. Protected endpoints verify this signature using a secret key. Passwords are never stored in plain text.
+- **How it works**: Uses stateless **JSON Web Tokens (JWT)**. On login, the server issues a signed token. Protected endpoints verify this signature using a secret key. Passwords are never stored in plain text.
 
 #### **Performance & Caching**
-
 - **Library**: `cachetools (TTLCache)`
-- **How it works**: To stay within Gemini's free tier quotas and ensure extreme speed, we implement an in-memory sliding cache. If the same sector is requested within 5 minutes, the result is served in **~14ms** without hitting external APIs.
+- **How it works**: To ensure extreme speed and protect Gemini's API quota, we implement an in-memory sliding cache. Repeated requests for the same sector return in **~14ms**.
 
 #### **Rate Limiting (Custom)**
-
 - **Implementation**: Sliding Window algorithm.
-- **How it works**: We track request timestamps in a per-user dictionary. If a user exceeds 5 requests per minute, the system rejects the call with a `429 Too Many Requests` status and a `Retry-After` header.
-
-#### **AI/Data Sources**
-
-- **LLM**: Google Gemini 1.5/2.x Flash.
-- **Web Search**: DuckDuckGo Search API (`ddgs`).
-- **Data Collection**: Real-time news is fetched, cleaned, and passed as context to the AI for professional synthesis.
+- **How it works**: Tracks request timestamps per user. Exceeding 5 requests/min triggers a `429` status with `Retry-After` headers.
 
 ---
 
-### Summary Table
+### Security Summary Table
 
 | Feature | Library / Model | How it Works (Short) |
 | :--- | :--- | :--- |
-| **FastAPI** | `fastapi` | Main API framework & async execution |
 | **Authentication** | `PyJWT`, `passlib` | Stateless JWT tokens + password hashing |
 | **Rate Limiting** | Custom Logic | Sliding window, per-IP, in-memory |
-| **Caching** | `cachetools` | 5-min TTL cache for instant responses |
 | **LLM (AI)** | `google-generativeai` | Gemini AI for report generation |
 | **Web Search** | `duckduckgo-search` | Scrape real-time market trends |
-| **Storage** | Python Dicts | In-memory only (stateless architecture) |
+| **Caching** | `cachetools` | 5-min TTL cache for instant responses |
 
 ---
 
-## Setup & Installation
+## 3. Setup & Installation
 
 1. **Clone the repository**:
-
    ```bash
    git clone https://github.com/DsThakurRawat/Appscrip.git
    cd Appscrip
    ```
 
 2. **Create and activate a virtual environment**:
-
    ```bash
    python3 -m venv venv
    source venv/bin/activate
    ```
 
 3. **Install dependencies**:
-
    ```bash
    pip install -r requirements.txt
    ```
 
 4. **Configure Environment**:
-
    Create a `.env` file:
-
    ```env
    GEMINI_API_KEY=your_gemini_api_key_here
    SECRET_KEY=your_jwt_secret_key_here
@@ -126,63 +116,46 @@ graph TD
 
 ---
 
-## Usage & API Flow
+## 4. API Specification & Usage
 
-### 1. Get Access Token
+### **Endpoint A: Token Generation**
+- **Method**: `POST`
+- **Path**: `/analyze/token`
+- **Auth**: Basic Auth (Demonstration uses pre-set guest credentials)
+- **Response**: `{"access_token": "...", "token_type": "bearer"}`
 
-**Endpoint**: `POST /analyze/token`
+### **Endpoint B: Sector Analysis**
+- **Method**: `GET`
+- **Path**: `/analyze/{sector}`
+- **Auth**: JWT (Bearer Token)
+- **Rate Limit**: 5 calls per minute.
+- **Parameters**: `sector` (string, min_length 3, regex `^[a-zA-Z ]+$`)
 
-```bash
-curl -X POST http://127.0.0.1:8000/analyze/token
-```
-
-### 2. Analyze a Market Sector
-
-**Endpoint**: `GET /analyze/{sector}`
-
+**Example Request**:
 ```bash
 curl -H "Authorization: Bearer YOUR_TOKEN" http://127.0.0.1:8000/analyze/technology
 ```
 
-### 3. Health Check
-
-**Endpoint**: `GET /analyze/health`
-
-```bash
-curl http://127.0.0.1:8000/analyze/health
-```
+### **Endpoint C: Health Check**
+- **Method**: `GET`
+- **Path**: `/analyze/health`
+- **Response**: `{"status": "healthy", ...}`
 
 ---
 
-## Core Logic Snippets
+## 5. Output & Implementation Screenshots
 
-### Input Validation & Safety
+### **Swagger API Documentation**
+The API includes interactive documentation where you can test the JWT flow directly.
+![Swagger Overview](docs/screenshots/swagger_overview.png)
 
-```python
-@router.get("/{sector}", response_model=MarketReport)
-async def analyze_sector(
-    sector: str = Path(..., min_length=3, regex="^[a-zA-Z ]+$"),
-    payload: dict = Depends(verify_jwt),
-    _rate_limit: None = Depends(check_rate_limit)
-):
-    # Data is automatically validated by FastAPI/Pydantic here
-    ...
-```
-
-### JWT Security Model
-
-```python
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-class User(BaseModel):
-    username: str
-```
+### **Sector Analysis Report**
+Example of a professional, AI-generated Indian market report for the 'Technology' sector.
+![Analysis Report](docs/screenshots/analysis_report.png)
 
 ---
 
-## Project Structure
+## 6. Project Structure
 
 - `app/main.py`: Entry point with CORS and Router initialization.
 - `app/api/`: Endpoint definitions and request/response handling.
