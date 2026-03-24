@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, Request, Path
+from fastapi import APIRouter, Depends, Request, Path, Query
+from fastapi.responses import PlainTextResponse
 from app.models.schemas import MarketReport
 from app.services.market_data import market_data_service
 from app.services.ai_analysis import ai_analysis_service
@@ -22,10 +23,11 @@ async def login(request: Request):
     access_token = create_access_token(data={"sub": "guest_user"})
     return {"access_token": access_token, "token_type": "bearer"}
 
-@router.get("/{sector}", response_model=MarketReport)
+@router.get("/{sector}")
 async def analyze_sector(
     request: Request,
     sector: str = Path(..., min_length=3, regex="^[a-zA-Z ]+$", description="The industry sector to analyze (e.g., 'technology', 'banking', 'pharma', etc.)"),
+    format: str = Query("json", regex="^(json|markdown)$", description="The output format (json or markdown)"),
     payload: dict = Depends(verify_jwt),
     _rate_limit: None = Depends(check_rate_limit)
 ):
@@ -45,5 +47,8 @@ async def analyze_sector(
     
     # 3. Analyze with AI
     report = await ai_analysis_service.analyze_sector(sector, raw_data)
+    
+    if format == "markdown":
+        return PlainTextResponse(content=report.markdown_report, media_type="text/markdown")
     
     return report
