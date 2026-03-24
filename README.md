@@ -20,24 +20,29 @@ A high-performance FastAPI service designed to analyze Indian market sectors usi
 ## Setup & Installation
 
 1. Clone the repository:
+
    ```bash
-   git clone <repo-url>
+   git clone https://github.com/DsThakurRawat/Appscrip.git
    cd Appscrip
    ```
 
 2. Create a virtual environment:
+
    ```bash
    python3 -m venv venv
    source venv/bin/activate
    ```
 
 3. Install dependencies:
+
    ```bash
    pip install -r requirements.txt
    ```
 
 4. Configure Environment:
+
    Create a `.env` file in the root directory:
+
    ```env
    GEMINI_API_KEY=your_gemini_api_key_here
    API_KEY=appscrip_dev_2026
@@ -46,6 +51,7 @@ A high-performance FastAPI service designed to analyze Indian market sectors usi
 ## Running the Application
 
 Start the development server:
+
 ```bash
 uvicorn app.main:app --reload
 ```
